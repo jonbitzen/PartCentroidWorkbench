@@ -1,6 +1,7 @@
 import os
 import FreeCADGui as Gui
 import FreeCAD as App
+import Draft
 from freecad.part_centroid import ICONPATH
 
 
@@ -12,34 +13,52 @@ class PartCentroidWorkbench(Gui.Workbench):
     MenuText = "PartCentroid Workbench"
     ToolTip = "A toolbench to change the centroid of imported models"
     Icon = os.path.join(ICONPATH, "icons8-crosshair-40.png")
-    toolbox = []
+    toolbox = ['CursorToCenter']
 
     def GetClassName(self):
         return "Gui::PythonWorkbench"
 
     def Initialize(self):
-        """
-        This function is called at the first activation of the workbench.
-        here is the place to import all the commands
-        """
-        # from freecad.part_centroid import my_numpy_function
-        # App.Console.PrintMessage("switching to PartCentroid workbench\n")
-        # App.Console.PrintMessage("run a numpy function: sqrt(100) = {}\n".format(my_numpy_function.my_foo(100)))
+        from . import commands
 
         self.appendToolbar("Tools", self.toolbox)
         self.appendMenu("Tools", self.toolbox)
 
+        Gui.addCommand('CursorToCenter', commands.cursor_to_center.CursorToCenterCommand())
+        Gui.addDocumentObserver(self)
+
+        cursor = self.createCursor()
+        if cursor is not None:
+            cursor.recompute(True)
+
+
     def Activated(self):
-        '''
-        code which should be computed when a user switch to this workbench
-        '''
-        pass
+        print("PartCentroid workbench activated")
 
     def Deactivated(self):
-        '''
-        code which should be computed when this workbench is deactivated
-        '''
-        pass
+        print("PartCentroid workbench deactivated")
+
+    def createCursor(self):
+
+        if App.ActiveDocument is None:
+            return None
+
+        cursor = App.ActiveDocument.getObject("centroid_cursor")
+        if cursor is None:
+            cursor = Draft.makePoint(
+                App.Vector(0,0,0), 
+                color=(235/255,164/255,52/255), 
+                point_size=10, 
+                name="centroid_cursor"
+            )
+        return cursor
+
+    def slotActivateDocument(self, vobj):
+        cursor = self.createCursor()
+        if cursor is not None:    
+            cursor.ViewObject.Visibility = True
+            cursor.recompute(True)
+            
 
 
 Gui.addWorkbench(PartCentroidWorkbench())
