@@ -29,11 +29,13 @@ class PartCentroidWorkbench(Gui.Workbench):
         Gui.addDocumentObserver(self)
 
     def Activated(self):
+        self.active = True
         cursor = self.createCursor()
         if cursor is not None:
             cursor.recompute(True)
 
     def Deactivated(self):
+        self.active = False
         if App.ActiveDocument is None:
             return
         
@@ -57,6 +59,9 @@ class PartCentroidWorkbench(Gui.Workbench):
         return cursor
 
     def slotActivateDocument(self, vobj):
+        if self.active is False:
+            return
+        
         cursor = self.createCursor()
         if cursor is not None:    
             cursor.ViewObject.Visibility = True
