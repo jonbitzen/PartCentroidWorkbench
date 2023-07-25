@@ -13,7 +13,7 @@ class PartCentroidWorkbench(Gui.Workbench):
     MenuText = "PartCentroid Workbench"
     ToolTip = "A toolbench to change the centroid of imported models"
     Icon = os.path.join(ICONPATH, "icons8-crosshair-40.png")
-    toolbox = ['CursorToCenter']
+    toolbox = ['CursorToCenter', 'CentroidToCursor']
 
     def GetClassName(self):
         return "Gui::PythonWorkbench"
@@ -25,18 +25,21 @@ class PartCentroidWorkbench(Gui.Workbench):
         self.appendMenu("Tools", self.toolbox)
 
         Gui.addCommand('CursorToCenter', commands.cursor_to_center.CursorToCenterCommand())
+        Gui.addCommand('CentroidToCursor', commands.centroid_to_cursor.CentroidToCursorCommand())
         Gui.addDocumentObserver(self)
 
+    def Activated(self):
         cursor = self.createCursor()
         if cursor is not None:
             cursor.recompute(True)
 
-
-    def Activated(self):
-        print("PartCentroid workbench activated")
-
     def Deactivated(self):
-        print("PartCentroid workbench deactivated")
+        if App.ActiveDocument is None:
+            return
+        
+        cursor = App.ActiveDocument.getObject("centroid_cursor")
+        if cursor is not None:
+            App.ActiveDocument.removeObject("centroid_cursor")
 
     def createCursor(self):
 

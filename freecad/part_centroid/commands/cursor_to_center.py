@@ -48,4 +48,5 @@ class CursorToCenterCommand(object):
             return
         
         cursor.Placement.Base = centroid
+        cursor.recompute(True)
         
