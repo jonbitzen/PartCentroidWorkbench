@@ -14,32 +14,48 @@ class CentroidToCursorCommand(object):
             'ToolTip':  'Moves the selection centroid to the location of the 3D cursor'
         }
     
-    def IsActive(self):
-        if (App.ActiveDocument is not None):
-            return True
-        return False
-    
-    def Activated(self):
-
-        cursor = App.ActiveDocument.getObject("centroid_cursor")
-        if cursor is None:
-            return
-        
+    def GetSelectedObjects(self):
         selected_objects = Gui.Selection.getSelectionEx()
+
         # remove the cursor, we dont use it to find a center point        
         selected_objects = \
             [sel_obj.Object for sel_obj in selected_objects if sel_obj.ObjectName != "centroid_cursor" ]
         
+        return selected_objects
+
+    def IsActive(self):
+        if App.ActiveDocument is None:
+            return False
+        
+        cursor = App.ActiveDocument.getObject("centroid_cursor")
+        if cursor is None:
+            return False
+
+        selected_objects = self.GetSelectedObjects()
+
         if len(selected_objects) < 1:
-            print("No object selected")
-            return
+            print("CentroidToCursorCommand::IsActive - No object selected")
+            return False
 
         if len(selected_objects) > 1:
-            print("Please select only one object to move its centroid")
-            return
-        
+            print("CentroidToCursorCommand::IsActive - Please select only one object to move its centroid")
+            return False
+
         selected_object = selected_objects[0]
 
+        if selected_object.TypeId != "Part::Feature":
+            print("CentroidToCursorCommand::IsActive - PartCentroid only works with Part::Feature objects")
+            return False
+
+        return True
+
+    def Activated(self):
+
+        selected_objects = self.GetSelectedObjects()
+
+        selected_object = selected_objects[0]
+
+        cursor = App.ActiveDocument.getObject("centroid_cursor")
         new_ctr = cursor.Placement.Base
 
         transform_mat = App.Matrix()
