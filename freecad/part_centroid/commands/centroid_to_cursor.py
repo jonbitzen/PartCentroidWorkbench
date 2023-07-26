@@ -60,8 +60,7 @@ class CentroidToCursorCommand(object):
 
         transform_mat = App.Matrix()
         transform_mat.move(-new_ctr)
-        new_shape = selected_object.Shape.transformGeometry(transform_mat)
-        selected_object.Shape = new_shape
+        selected_object.Shape = selected_object.Shape.transformed(transform_mat, copy=True)
         selected_object.recompute(True)
 
         cursor.Placement.Base = App.Vector(0,0,0)
