@@ -56,7 +56,8 @@ class CentroidToCursorCommand(object):
         selected_object = selected_objects[0]
 
         cursor = App.ActiveDocument.getObject("centroid_cursor")
-        new_ctr = cursor.Placement.Base
+        obj_placement = selected_object.Placement.Base
+        new_ctr = cursor.Placement.Base - obj_placement
 
         transform_mat = App.Matrix()
         transform_mat.move(-new_ctr)
