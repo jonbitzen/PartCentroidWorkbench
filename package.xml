@@ -11,7 +11,7 @@
 
   <maintainer email="jonbitzen@hotmail.com">jonbitzen</maintainer>
 
-  <license file="LICENSE">LGPL 2.1</license>
+  <license file="LICENSE">LGPL-2.1</license>
 
   <url branch="main" type="repository">https://github.com/jonbitzen/PartCentroidWorkbench</url>
 
